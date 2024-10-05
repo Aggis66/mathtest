@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三位數減法遊戲</title>
+    <style>
+        .vertical-calc {
+            display: inline-block;
+            text-align: right;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .calc-box {
+            display: inline-block;
+            border: 1px solid black;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .btn {
+            margin-top: 10px;
+            display: block;
+        }
+
+        .paused {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>三位數減法遊戲</h1>
+    <form id="gameForm">
+        <label for="name">姓名：</label>
+        <input type="text" id="name" required><br><br>
+
+        <label for="questionCount">題目數量：</label>
+        <input type="number" id="questionCount" min="1" max="10" required><br><br>
+
+        <label for="questionType">題目類型：</label>
+        <select id="questionType" required>
+            <option value="混和">混和</option>
+            <option value="退位">退位</option>
+            <option value="不退位">不退位</option>
+        </select><br><br>
+
+        <button type="button" onclick="startGame()">開始遊戲</button>
+    </form>
+
+    <div id="questionSection" style="display:none;">
+        <div class="vertical-calc" id="calculationDisplay"></div>
+        <div>
+            <input type="number" id="userAnswer">
+        </div>
+        <button type="button" onclick="submitAnswer()" class="btn">提交答案</button>
+        <button type="button" onclick="pauseGame()" class="btn">暫停</button>
+        <p id="feedback"></p>
+        <p id="timer">已用時間：0 秒</p>
+    </div>
+
+    <script>
+        let name = '';
+        let questionCount = 0;
+        let questionType = '';
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let startTime = 0;
+        let totalTime = 0;
+        let timerInterval = null;
+        let paused = false;
+        let questions = [];
+
+        function startGame() {
+            name = document.getElementById('name').value;
+            questionCount = parseInt(document.getElementById('questionCount').value);
+            questionType = document.getElementById('questionType').value;
+
+            if (!name || questionCount <= 0) {
+                alert('請輸入正確的資料');
+                return;
+            }
+
+            document.getElementById('gameForm').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'block';
+
+            startTime = new Date();
+            generateQuestions();
+            showNextQuestion();
+            startTimer();
+        }
+
+        function generateQuestions() {
+            for (let i = 0; i < questionCount; i++) {
+                let num1 = Math.floor(Math.random() * 900) + 100;
+                let num2 = Math.floor(Math.random() * 900) + 100;
+
+                if (questionType === '不退位' && num1 < num2) {
+                    [num1, num2] = [num2, num1];
+                }
+
+                if (questionType === '退位' && num1 >= num2 && num1 % 10 >= num2 % 10) {
+                    num1 = Math.floor(Math.random() * 900) + 100;
+                    num2 = Math.floor(Math.random() * num1);
+                }
+
+                questions.push({ num1, num2 });
+            }
+        }
+
+        function showNextQuestion() {
+            if (currentQuestion < questionCount) {
+                const question = questions[currentQuestion];
+                const calcHtml = `
+                    <div class="calc-box">${Math.floor(question.num1 / 100)}</div>
+                    <div class="calc-box">${Math.floor((question.num1 % 100) / 10)}</div>
+                    <div class="calc-box">${question.num1 % 10}</div><br>
+                    <span>-</span>
+                    <div class="calc-box">${Math.floor(question.num2 / 100)}</div>
+                    <div class="calc-box">${Math.floor((question.num2 % 100) / 10)}</div>
+                    <div class="calc-box">${question.num2 % 10}</div>
+                `;
+
+                document.getElementById('calculationDisplay').innerHTML = calcHtml;
+            } else {
+                endGame();
+            }
+        }
+
+        function submitAnswer() {
+            const userAnswer = parseInt(document.getElementById('userAnswer').value);
+            const question = questions[currentQuestion];
+            const correctAnswer = question.num1 - question.num2;
+
+            if (userAnswer === correctAnswer) {
+                document.getElementById('feedback').innerText = '正確答案！';
+                correctAnswers++;
+            } else {
+                document.getElementById('feedback').innerText = `錯誤答案，繼續加油！ 正確答案是 ${correctAnswer}。`;
+            }
+
+            currentQuestion++;
+            setTimeout(() => {
+                document.getElementById('feedback').innerText = '';
+                showNextQuestion();
+            }, 1000);
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!paused) {
+                    totalTime = Math.floor((new Date() - startTime) / 1000);
+                    document.getElementById('timer').innerText = `已用時間：${totalTime} 秒`;
+                }
+            }, 1000);
+        }
+
+        function pauseGame() {
+            paused = !paused;
+            if (paused) {
+                document.getElementById('feedback').innerText = '遊戲已暫停';
+                clearInterval(timerInterval);
+            } else {
+                document.getElementById('feedback').innerText = '';
+                startTimer();
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('feedback').innerText = `${name}，你答對了 ${correctAnswers} 題，共用了 ${totalTime} 秒。`;
+        }
+    </script>
+</body>
+</html>
