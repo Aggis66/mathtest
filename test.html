@@ -193,6 +193,11 @@
                 document.getElementById('num2Tens').innerText = Math.floor((question.num2 % 100) / 10);
                 document.getElementById('num2Ones').innerText = question.num2 % 10;
 
+                // 清空輸入欄位
+                document.getElementById('hundreds').value = '';
+                document.getElementById('tens').value = '';
+                document.getElementById('ones').value = '';
+
                 // 處理退位邏輯
                 document.getElementById('borrowHundreds').innerText = '';
                 document.getElementById('borrowTens').innerText = '';
@@ -203,6 +208,9 @@
                 }
                 if (Math.floor((question.num1 % 100) / 10) < Math.floor((question.num2 % 100) / 10)) {
                     document.getElementById('borrowTens').innerText = '1';
+                }
+                if (Math.floor(question.num1 / 100) < Math.floor(question.num2 / 100)) {
+                    document.getElementById('borrowHundreds').innerText = '1';
                 }
             } else {
                 endGame();
