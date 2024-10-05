@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>三位數減法遊戲</title>
     <style>
-        .vertical-calc {
-            text-align: right;
+        table {
+            margin: 0 auto;
             font-size: 24px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
+            text-align: center;
+            border-collapse: collapse;
         }
 
         .calc-box, .input-box {
-            display: inline-block;
             width: 50px;
             height: 50px;
             font-size: 24px;
@@ -24,7 +21,6 @@
         }
 
         .borrow-box {
-            display: inline-block;
             width: 50px;
             height: 30px;
             text-align: center;
@@ -40,14 +36,13 @@
         #progress {
             font-size: 18px;
             margin-bottom: 10px;
+            text-align: center;
         }
 
-        .result-section {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            margin-top: 10px;
+        #timer {
+            text-align: center;
         }
+
     </style>
 </head>
 <body>
