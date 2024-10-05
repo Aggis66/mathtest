@@ -26,8 +26,18 @@
             display: block;
         }
 
-        .paused {
+        .borrow-box {
+            display: inline-block;
+            width: 50px;
+            height: 30px;
+            text-align: center;
+            font-size: 18px;
             color: red;
+        }
+
+        #progress {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -51,9 +61,18 @@
     </form>
 
     <div id="questionSection" style="display:none;">
+        <p id="progress"></p>
         <div class="vertical-calc" id="calculationDisplay"></div>
         <div>
-            <input type="number" id="userAnswer">
+            <div class="calc-box">
+                <input type="number" id="hundreds" style="width: 40px; text-align: center;">
+            </div>
+            <div class="calc-box">
+                <input type="number" id="tens" style="width: 40px; text-align: center;">
+            </div>
+            <div class="calc-box">
+                <input type="number" id="ones" style="width: 40px; text-align: center;">
+            </div>
         </div>
         <button type="button" onclick="submitAnswer()" class="btn">提交答案</button>
         <button type="button" onclick="pauseGame()" class="btn">暫停</button>
@@ -113,7 +132,14 @@
         function showNextQuestion() {
             if (currentQuestion < questionCount) {
                 const question = questions[currentQuestion];
+
+                // 更新進度
+                document.getElementById('progress').innerText = `第 ${currentQuestion + 1} 題 / 總 ${questionCount} 題`;
+
                 const calcHtml = `
+                    <div class="borrow-box"></div>
+                    <div class="borrow-box"></div>
+                    <div class="borrow-box"></div><br>
                     <div class="calc-box">${Math.floor(question.num1 / 100)}</div>
                     <div class="calc-box">${Math.floor((question.num1 % 100) / 10)}</div>
                     <div class="calc-box">${question.num1 % 10}</div><br>
@@ -130,7 +156,12 @@
         }
 
         function submitAnswer() {
-            const userAnswer = parseInt(document.getElementById('userAnswer').value);
+            const hundredsInput = parseInt(document.getElementById('hundreds').value);
+            const tensInput = parseInt(document.getElementById('tens').value);
+            const onesInput = parseInt(document.getElementById('ones').value);
+
+            const userAnswer = hundredsInput * 100 + tensInput * 10 + onesInput;
+
             const question = questions[currentQuestion];
             const correctAnswer = question.num1 - question.num2;
 
